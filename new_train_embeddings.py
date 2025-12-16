@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 from deepface import DeepFace
 
-# ---------------- CONFIG ----------------
+# ---------------- CONFIG ---------------
 FACE_MODEL = "ArcFace"
 DATASET_DIR = "dataset"
 OUTPUT_PATH = "embeddings/face_embeddings.pkl"

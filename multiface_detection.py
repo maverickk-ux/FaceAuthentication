@@ -7,7 +7,7 @@ from deep_sort_realtime.deepsort_tracker import DeepSort
 from deepface import DeepFace
 from collections import defaultdict
 
-# ================= CONFIG =================
+# ================= CONFIG ================
 FACE_MODEL = "ArcFace"
 
 # Tuned for LIVE webcam
