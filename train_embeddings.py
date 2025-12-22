@@ -3,43 +3,53 @@ import pickle
 import numpy as np
 from deepface import DeepFace
 
+# ---------------- CONFIG ----------------
 FACE_MODEL = "ArcFace"
 DATASET_DIR = "dataset"
 OUTPUT_PATH = "embeddings/face_embeddings.pkl"
+MIN_IMAGES = 5
+
+os.makedirs("embeddings", exist_ok=True)
 
 database = {}
 
-print("[INFO] Starting training...")
+print("[INFO] Training embeddings (CACHE-SAFE VERSION)...")
 
-for person in os.listdir(DATASET_DIR):
+for person in sorted(os.listdir(DATASET_DIR)):
     person_dir = os.path.join(DATASET_DIR, person)
     if not os.path.isdir(person_dir):
         continue
 
     embeddings = []
+    print(f"\n[INFO] Processing {person}")
 
-    for img in os.listdir(person_dir):
-        img_path = os.path.join(person_dir, img)
+    for img_name in os.listdir(person_dir):
+        img_path = os.path.join(person_dir, img_name)
 
         try:
             rep = DeepFace.represent(
                 img_path=img_path,
                 model_name=FACE_MODEL,
-                enforce_detection=False
+                detector_backend="retinaface",
+                enforce_detection=True,
+                align=True
             )
+
             embeddings.append(np.array(rep[0]["embedding"]))
+            print(f"[OK] {img_name}")
+
         except Exception as e:
-            print(f"[WARN] {person}/{img} skipped")
+            print(f"[SKIP] {img_name} ({str(e)[:50]})")
 
-    if len(embeddings) >= 5:
+    if len(embeddings) >= MIN_IMAGES:
         database[person] = embeddings
-        print(f"[OK] {person}: {len(embeddings)} images trained")
+        print(f"[DONE] {person}: {len(embeddings)} embeddings saved")
     else:
-        print(f"[SKIP] {person}: not enough images")
+        print(f"[REJECTED] {person}: only {len(embeddings)} valid faces")
 
-os.makedirs("embeddings", exist_ok=True)
-
+# ---------------- SAVE ----------------
 with open(OUTPUT_PATH, "wb") as f:
     pickle.dump(database, f)
 
-print(f"[DONE] Training completed. Saved to {OUTPUT_PATH}")
+print("\n[SUCCESS] Training complete")
+print("[INFO] Identities:", list(database.keys()))
