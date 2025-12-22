@@ -121,10 +121,22 @@ pip install opencv-python deepface ultralytics deep-sort-realtime tf-keras numpy
 
 ## Training the Face Recognition Model
 
-### 1. Prepare Training Data
-- Create a folder for each person inside `dataset/`
-- Add **10–20 images** per person with different angles and lighting
-- Example structure:
+### 1. User Registration
+- Run the registration script:
+```
+python register.py
+```
+- What happens automatically:
+  - Prompts for the person’s name
+  - Opens the webcam
+  - Captures ~15 face images at different angles
+  - Stores images in:
+    ``` dataset/<Person_Name>/```
+  - Automatically runs the training pipeline
+  - Generates / updates:
+    ``` embeddings/face_embeddings.pkl```
+    
+- After registration, the dataset will look like this:
   ```
   dataset/
   ├── Shashank/
@@ -136,17 +148,7 @@ pip install opencv-python deepface ultralytics deep-sort-realtime tf-keras numpy
   └── Varun/
       └── ...
   ```
-
-### 2. Run Training Script
-```bash
-python train_embeddings.py
-```
-
-This generates:
-```
-embeddings/face_embeddings.pkl
-```
-This acts as your trained AI identity database.
+Each person has a dedicated folder containing multiple face images captured from the webcam.
 
 ---
 
@@ -160,7 +162,10 @@ python track.py
 - Opens webcam feed
 - Detects and tracks people in real-time
 - Recognizes faces and displays permanent ID with name
-- Analyzes and displays current emotion with confidence score
+- Analyzes and displays:
+  - Person name (if recognized)
+  - Permanent ID
+  - Emotion label with confidence score
 - Press `q` to exit
 
 **Sample Output:**
